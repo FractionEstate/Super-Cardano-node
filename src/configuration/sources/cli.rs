@@ -13,13 +13,13 @@ pub fn load_cli_args() -> Result<Configuration> {
             Arg::new("network")
                 .long("network")
                 .help("Specifies the network type")
-                .takes_value(true),
+                ,
         )
         .arg(
             Arg::new("port")
                 .long("port")
                 .help("Specifies the port to listen on")
-                .takes_value(true),
+                ,
         )
         .get_matches();
 
