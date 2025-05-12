@@ -57,31 +57,7 @@ pub struct PeersResponse {
     pub peers: Vec<PeerInfo>,
 }
 
-#[tonic::async_trait]
-pub trait CardanoNodeApi: Send + Sync + 'static {
-    async fn health(
-        &self,
-        request: Request<HealthRequest>,
-    ) -> Result<Response<HealthResponse>, Status>;
-    async fn tip(&self, request: Request<TipRequest>) -> Result<Response<TipResponse>, Status>;
-    async fn block(
-        &self,
-        request: Request<BlockRequest>,
-    ) -> Result<Response<BlockResponse>, Status>;
-    async fn submit_tx(
-        &self,
-        request: Request<SubmitTxRequest>,
-    ) -> Result<Response<SubmitTxResponse>, Status>;
-    async fn peers(
-        &self,
-        request: Request<PeersRequest>,
-    ) -> Result<Response<PeersResponse>, Status>;
-}
-
-/// Starts the gRPC server (stub)
-pub async fn start_grpc_server() {
-    // TODO: Implement Tonic gRPC server and register CardanoNodeApi
-}
+// (Removed duplicate trait and function definitions)
 /// gRPC service trait (to be implemented with Tonic)
 #[tonic::async_trait]
 pub trait CardanoNodeApi: Send + Sync + 'static {

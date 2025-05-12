@@ -7,11 +7,9 @@ use serde::{Deserialize, Serialize};
 /// Returns node health status.
 ///
 /// # Example
-/// ```
 /// curl http://localhost:8080/health
-/// ```
+pub async fn get_health() -> &'static str {
     "ok"
-
 }
 
 /// Get the current chain tip: GET /tip
@@ -68,30 +66,6 @@ pub async fn submit_tx(_req: SubmitTxRequest) -> SubmitTxResponse {
 }
 
 /// Get connected peers: GET /peers
-pub struct PeerInfo {
-    pub address: String,
-    pub connected: bool,
-}
-
-        address: "127.0.0.1:3001".to_string(),
-        connected: true,
-    }]
-}
-/// Get connected peers: GET /peers
-    // TODO: Query real peer manager
-/// Get connected peers: GET /peers
-pub async fn get_peers() -> Vec<PeerInfo> {
-    // TODO: Query real peer manager
-    vec![PeerInfo {
-        address: "127.0.0.1:3001".to_string(),
-        connected: true,
-    }]
-}
-    vec![PeerInfo {
-        address: "127.0.0.1:3001".to_string(),
-        connected: true,
-    }]
-
 #[derive(Serialize, Deserialize)]
 pub struct PeerInfo {
     pub address: String,
@@ -103,35 +77,6 @@ pub async fn get_peers() -> Vec<PeerInfo> {
     vec![PeerInfo {
         address: "127.0.0.1:3001".to_string(),
         connected: true,
-    }]
-}
-}
-#[derive(Serialize, Deserialize)]
-pub struct PeerInfo {
-    pub address: String,
-    pub connected: bool,
-}
-
-/// Get connected peers: GET /peers
-pub async fn get_peers() -> Vec<PeerInfo> {
-    // TODO: Query real peer manager
-    vec![PeerInfo {
-        address: "127.0.0.1:3001".to_string(),
-        connected: true,
-/// Get connected peers: GET /peers
-#[derive(Serialize, Deserialize)]
-pub struct PeerInfo {
-    pub address: String,
-    pub connected: bool,
-}
-
-pub async fn get_peers() -> Vec<PeerInfo> {
-    // TODO: Query real peer manager
-    vec![PeerInfo {
-        address: "127.0.0.1:3001".to_string(),
-        connected: true,
-    }]
-}
     }]
 }
 
@@ -221,5 +166,9 @@ pub struct MetricsResponse {
 
 pub async fn get_metrics() -> MetricsResponse {
     // TODO: Gather real metrics
-    MetricsResponse { uptime: 0, block_count: 0, peer_count: 0 }
+    MetricsResponse {
+        uptime: 0,
+        block_count: 0,
+        peer_count: 0,
+    }
 }

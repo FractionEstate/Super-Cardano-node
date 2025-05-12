@@ -1,3 +1,10 @@
+/// Peer discovery method for networking.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum DiscoveryMethod {
+    Static,
+    Dns,
+    Upnp,
+}
 use serde::{Deserialize, Serialize};
 
 /// Represents the main configuration structure.
@@ -10,11 +17,13 @@ pub struct Configuration {
 }
 
 /// Network-related configuration.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NetworkConfig {
     pub listen_address: String,
     pub port: u16,
     pub max_peers: usize,
+    pub bind_addr: String,
+    pub discovery: String,
 }
 
 /// Database-related configuration.

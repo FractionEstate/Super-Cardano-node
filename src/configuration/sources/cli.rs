@@ -1,29 +1,39 @@
 use crate::configuration::types::Configuration;
+use crate::configuration::{ConsensusConfig, DatabaseConfig, LoggingConfig, NetworkConfig};
 use anyhow::Result;
-use clap::{App, Arg};
+use clap::{Arg, Command};
 
 /// Loads configuration from CLI arguments.
 pub fn load_cli_args() -> Result<Configuration> {
-    let matches = App::new("Cardano Node")
+    let matches = Command::new("Cardano Node")
         .version("1.0")
         .author("FractionEstate")
         .about("A high-performance Cardano Node implementation")
-        .arg(Arg::new("network")
-            .long("network")
-            .about("Specifies the network type")
-            .takes_value(true))
-        .arg(Arg::new("port")
-            .long("port")
-            .about("Specifies the port to listen on")
-            .takes_value(true))
+        .arg(
+            Arg::new("network")
+                .long("network")
+                .help("Specifies the network type")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::new("port")
+                .long("port")
+                .help("Specifies the port to listen on")
+                .takes_value(true),
+        )
         .get_matches();
 
     // Example: Parse CLI arguments into a Configuration struct
     let config = Configuration {
         network: NetworkConfig {
             listen_address: "0.0.0.0".to_string(),
-            port: matches.value_of("port").unwrap_or("3000").parse()?,
+            port: matches
+                .get_one::<String>("port")
+                .map(|s| s.parse().unwrap_or(3000))
+                .unwrap_or(3000),
             max_peers: 100,
+            bind_addr: "0.0.0.0:3000".to_string(),
+            discovery: "static".to_string(),
         },
         database: DatabaseConfig {
             path: "./data".to_string(),

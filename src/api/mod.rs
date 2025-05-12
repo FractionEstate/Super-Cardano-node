@@ -1,9 +1,12 @@
-//! Public API module for Super Cardano Node
-//!
-//! Exposes REST and gRPC endpoints for node, chain, and wallet operations.
-//!
-//! - REST API: Axum
-//! - gRPC API: Tonic
+/// Shared application state for API handlers (stub)
+pub struct AppState;
+pub type SharedAppState = std::sync::Arc<AppState>;
+// Public API module for Super Cardano Node
+//
+// Exposes REST and gRPC endpoints for node, chain, and wallet operations.
+//
+// - REST API: Axum
+// - gRPC API: Tonic
 
 pub mod grpc;
 pub mod rest;
