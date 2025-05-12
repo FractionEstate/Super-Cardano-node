@@ -1,7 +1,7 @@
 //! Integration tests for the wallet module
 
-use Super_Cardano_node::wallet::Wallet;
-use Super_Cardano_node::chaindb::ChainDB;
+use crate::wallet::Wallet;
+use crate::chaindb::ChainDB;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 

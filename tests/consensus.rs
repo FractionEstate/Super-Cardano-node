@@ -1,6 +1,6 @@
 //! Tests for Ouroboros consensus logic (Praos, slot leadership).
 
-use Super_Cardano_node::consensus::{praos_is_leader, PraosKeys};
+use crate::consensus::{praos_is_leader, PraosKeys};
 
 #[test]
 fn test_praos_leader_threshold() {

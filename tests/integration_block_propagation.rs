@@ -2,9 +2,9 @@
 
 #[tokio::test]
 async fn test_block_propagation_and_fork_choice() {
-    use Super_Cardano_node::ledger::{Ledger, Block, Transaction, Chain, select_chain};
-    use Super_Cardano_node::protocol::Protocol;
-    use Super_Cardano_node::mempool::Mempool;
+    use crate::ledger::{Ledger, Block, Transaction, Chain, select_chain};
+    use crate::protocol::Protocol;
+    use crate::mempool::Mempool;
     use std::sync::Arc;
     use tokio::sync::Mutex;
     let tracer = Super_Cardano_node::tracing::tracers::Tracer::default();

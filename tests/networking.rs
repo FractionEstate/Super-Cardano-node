@@ -1,6 +1,6 @@
 //! Tests for networking module (peer manager, peer selector).
 
-use Super_Cardano_node::networking::PeerSelector;
+use crate::networking::PeerSelector;
 
 #[test]
 fn test_peer_manager_get_peers() {

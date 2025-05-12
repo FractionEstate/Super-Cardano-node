@@ -10,7 +10,7 @@
 //! # Usage Example
 //! ```rust,ignore
 //! // This example requires an async context and a real Block/LedgerState
-//! // use Super_Cardano_node::chaindb::ChainDB;
+//! // use crate::chaindb::ChainDB;
 //! // let mut db = ChainDB::open("./data/chaindb").await.unwrap();
 //! // db.append_block(&block, &state).await.unwrap();
 //! ```

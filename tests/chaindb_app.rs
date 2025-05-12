@@ -1,6 +1,6 @@
 //! Application-facing integration test for ChainDB block/UTXO queries
 
-use Super_Cardano_node::chaindb::ChainDB;
+use crate::chaindb::ChainDB;
 use tokio::runtime::Runtime;
 
 #[test]

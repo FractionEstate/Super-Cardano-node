@@ -1,7 +1,7 @@
 //! Integration and unit tests for the Ledger module (UTXO, block/tx validation).
 
-use Super_Cardano_node::ledger::Ledger;
-use Super_Cardano_node::tracing::tracers::Tracer;
+use crate::ledger::Ledger;
+use crate::tracing::tracers::Tracer;
 
 #[test]
 fn test_ledger_new_and_tip_hash() {

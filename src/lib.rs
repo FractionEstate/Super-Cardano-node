@@ -1,3 +1,5 @@
+pub mod app_state;
+pub mod services;
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 #![allow(unused)]
@@ -15,9 +17,9 @@
 //!
 //! ## Usage Example
 //! ```rust
-//! use Super_Cardano_node::configuration::Config;
-//! use Super_Cardano_node::ledger::Ledger;
-//! use Super_Cardano_node::protocol::Protocol;
+//! use crate::configuration::Config;
+//! use crate::ledger::Ledger;
+//! use crate::protocol::Protocol;
 //! // ...
 //! ```
 //!
@@ -50,32 +52,40 @@
 mod tests {
     // Removed: use super::*;
     // Fix test import: use crate::configuration::{...} for correct path in integration tests
-    use crate::configuration::{Config, NetworkConfig, ConsensusConfig, ProtocolConfig};
+    use crate::configuration::{Config, ConsensusConfig, NetworkConfig, ProtocolConfig};
 
     #[test]
     fn test_config_validation() {
         let config = Config {
-            network: NetworkConfig { bind_addr: "127.0.0.1:3001".to_string(), max_peers: 8, discovery: None },
-            consensus: ConsensusConfig { protocol: "Ouroboros".to_string() },
-            protocol: ProtocolConfig { era: "Shelley".to_string() },
+            network: NetworkConfig {
+                bind_addr: "127.0.0.1:3001".to_string(),
+                max_peers: 8,
+                discovery: None,
+            },
+            consensus: ConsensusConfig {
+                protocol: "Ouroboros".to_string(),
+            },
+            protocol: ProtocolConfig {
+                era: "Shelley".to_string(),
+            },
         };
         assert!(config.validate());
     }
 }
 
+pub mod api;
+pub mod chaindb;
 pub mod configuration;
 pub mod consensus;
 pub mod handlers;
 pub mod ledger;
 pub mod mempool;
 pub mod networking;
+pub mod proto_convert;
 pub mod protocol;
 pub mod queries;
 pub mod tracing;
-pub mod chaindb;
-pub mod proto_convert;
 pub mod wallet;
-pub mod api;
 
 pub mod chaindb_proto {
     tonic::include_proto!("chaindb");

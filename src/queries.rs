@@ -43,7 +43,7 @@ impl Queries {
     /// # Example
     /// ```rust,ignore
     /// // This function is async and must be called in an async context
-    /// // use Super_Cardano_node::queries::Queries;
+    /// // use crate::queries::Queries;
     /// // let state = Queries::node_state().await;
     /// ```
     #[allow(dead_code)]
@@ -60,7 +60,7 @@ impl Queries {
     /// # Example
     /// ```rust,ignore
     /// // This function is async and must be called in an async context
-    /// // use Super_Cardano_node::queries::Queries;
+    /// // use crate::queries::Queries;
     /// // let state = Queries::chain_state().await;
     /// ```
     #[allow(dead_code)]
@@ -76,7 +76,7 @@ impl Queries {
     /// # Example
     /// ```rust,ignore
     /// // This function is async and must be called in an async context
-    /// // use Super_Cardano_node::queries::Queries;
+    /// // use crate::queries::Queries;
     /// // let peers = Queries::peer_list().await;
     /// ```
     #[allow(dead_code)]
@@ -92,7 +92,7 @@ impl Queries {
     /// # Example
     /// ```rust,ignore
     /// // This function is async and must be called in an async context
-    /// // use Super_Cardano_node::queries::Queries;
+    /// // use crate::queries::Queries;
     /// // let mempool = Queries::mempool_state().await;
     /// ```
     #[allow(dead_code)]

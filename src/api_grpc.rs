@@ -9,8 +9,8 @@ use futures_core::stream::Stream;
 use std::pin::Pin;
 use tonic::{Request, Response, Status, transport::Server};
 
-use Super_Cardano_node::chaindb_proto;
-use Super_Cardano_node::proto_convert::{block_to_proto, transaction_to_proto, txoutput_to_proto};
+use crate::chaindb_proto;
+use crate::proto_convert::{block_to_proto, transaction_to_proto, txoutput_to_proto};
 // Correct import for generated server trait (prost/tonic lowercases and underscores service names)
 use chaindb_proto::chain_db_service_server::{ChainDbService, ChainDbServiceServer};
 pub struct ChainDbGrpcServer {
