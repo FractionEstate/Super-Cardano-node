@@ -1,0 +1,46 @@
+# Ignore Rust build debug output
+target/debug/
+target/debug-*/
+target/debug/**
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Byproducts
+*.rlib
+*.d
+*.o
+*.so
+*.dll
+*.exe
+*.a
+*.lib
+
+# Test output
+/testdata/
+/tests/output/
+
+# Protobuf
+protoc-30.2/
+protoc-30.2-win64.zip
+
+# Misc
+*.swp
+*.swo
+.idea/
+*.iml
+
+# Ignore config secrets (if any)
+config.local.yaml

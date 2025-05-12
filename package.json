@@ -1,0 +1,14 @@
+{
+  "name": "super-cardano-node",
+  "version": "0.1.0",
+  "description": "Dev scripts and tooling for Super Cardano Node (Rust)",
+  "scripts": {
+    "build": "cargo build",
+    "test": "cargo test",
+    "run": "cargo run"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
