@@ -16,12 +16,18 @@ pub mod alonzo;
 pub mod conway;
 pub mod allegra;
 pub mod mary;
+pub mod babbage;
 pub mod types;
 
 pub use crate::protocol::allegra::*;
 pub use crate::protocol::mary::*;
 pub use crate::protocol::conway::*;
 pub use crate::protocol::conway::ConwayProtocol;
+pub use crate::protocol::babbage::*;
+pub use crate::protocol::babbage::BabbageProtocol;
+
+mod hard_fork_combinator;
+pub use hard_fork_combinator::HardForkCombinator;
 
 /// Supported Cardano protocol eras
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -31,6 +37,7 @@ pub enum Era {
     Allegra,
     Mary,
     Alonzo,
+    Babbage,
     Conway,
     // ... add more as needed
 }
@@ -43,6 +50,7 @@ impl Era {
             "allegra" => Era::Allegra,
             "mary" => Era::Mary,
             "alonzo" => Era::Alonzo,
+            "babbage" => Era::Babbage,
             "conway" => Era::Conway,
             _ => Era::Byron,
         }
@@ -108,77 +116,44 @@ impl EraLogic for MaryEra {
     fn validate_block(&self, _block: &crate::ledger::Block) -> bool { true }
 }
 
-#[allow(dead_code)]
-/// Hard fork combinator: manages current era and transitions
-pub struct HardForkCombinator {
-    pub current_era: Era,
-    pub era_logic: Box<dyn EraLogic>,
-    pub next_era: Option<(Era, Box<dyn EraLogic>)>,
-    pub transition_epoch: Option<u64>,
+/// Babbage era logic
+pub struct BabbageEra;
+impl EraLogic for BabbageEra {
+    fn name(&self) -> &'static str { "Babbage" }
+    fn validate_transaction(&self, tx: &crate::ledger::Transaction) -> bool {
+        // Babbage: like Alonzo, but could add reference inputs/scripts checks here
+        !tx.inputs.is_empty() && tx.outputs.iter().all(|o| o.amount > 0)
+    }
+    fn validate_block(&self, _block: &crate::ledger::Block) -> bool { true }
 }
 
-impl HardForkCombinator {
-    /// Create a new hard fork combinator for the given era
-    pub fn new(era: Era) -> Self {
-        let era_logic: Box<dyn EraLogic> = match era {
-            Era::Byron => Box::new(ByronEra),
-            Era::Shelley => Box::new(ShelleyEra),
-            Era::Allegra => Box::new(AllegraEra),
-            Era::Mary => Box::new(MaryEra),
-            Era::Alonzo => Box::new(AlonzoEra),
-            Era::Conway => Box::new(ConwayProtocol {}),
-        };
-        Self {
-            current_era: era,
-            era_logic,
-            next_era: None,
-            transition_epoch: None,
-        }
-    }
-
-    #[allow(dead_code)]
-    /// Schedule a transition to a new era at a given epoch
-    pub fn schedule_transition(&mut self, next_era: Era, epoch: u64) {
-        let logic: Box<dyn EraLogic> = match next_era {
-            Era::Byron => Box::new(ByronEra),
-            Era::Shelley => Box::new(ShelleyEra),
-            Era::Allegra => Box::new(AllegraEra),
-            Era::Mary => Box::new(MaryEra),
-            Era::Alonzo => Box::new(AlonzoEra),
-            Era::Conway => Box::new(ConwayProtocol {}),
-        };
-        self.next_era = Some((next_era, logic));
-        self.transition_epoch = Some(epoch);
-    }
-
-    #[allow(dead_code)]
-    /// Check and perform era transition if the given epoch matches
-    pub fn check_transition(&mut self, current_epoch: u64) {
-        if let Some(epoch) = self.transition_epoch {
-            if current_epoch >= epoch {
-                if let Some((era, logic)) = self.next_era.take() {
-                    self.current_era = era;
-                    self.era_logic = logic;
-                    self.transition_epoch = None;
-                }
-            }
-        }
-    }
-}
-
-/// Represents the protocol logic of the node, including multi-era support.
-pub struct Protocol {
-    #[allow(dead_code)]
-    config: ProtocolConfig,
-    pub hard_fork: HardForkCombinator,
-}
-
-#[allow(dead_code)]
 impl Protocol {
     /// Create a new protocol handler with the given configuration.
     pub fn new(config: ProtocolConfig) -> Self {
-        let era = Era::from_str(&config.era);
-        let hard_fork = HardForkCombinator::new(era);
+        let initial_era = Era::from_str(&config.era);
+        let initial_logic: Box<dyn EraLogic> = match initial_era {
+            Era::Byron => Box::new(ByronEra),
+            Era::Shelley => Box::new(ShelleyEra),
+            Era::Allegra => Box::new(AllegraEra),
+            Era::Mary => Box::new(MaryEra),
+            Era::Alonzo => Box::new(AlonzoEra),
+            Era::Babbage => Box::new(BabbageProtocol {}),
+            Era::Conway => Box::new(ConwayProtocol {}),
+        };
+
+        let mut hard_fork = HardForkCombinator::new(initial_era, initial_logic);
+
+        // Example: Schedule Shelley to Allegra transition at epoch 208
+        hard_fork.schedule_transition(208, Era::Allegra, Box::new(AllegraEra));
+        // Example: Schedule Allegra to Mary at epoch 236
+        hard_fork.schedule_transition(236, Era::Mary, Box::new(MaryEra));
+        // Example: Schedule Mary to Alonzo at epoch 251
+        hard_fork.schedule_transition(251, Era::Alonzo, Box::new(AlonzoEra));
+        // Example: Schedule Alonzo to Babbage at epoch 360
+        hard_fork.schedule_transition(360, Era::Babbage, Box::new(BabbageProtocol {}));
+        // Example: Schedule Babbage to Conway at epoch 400
+        hard_fork.schedule_transition(400, Era::Conway, Box::new(ConwayProtocol {}));
+
         Self { config, hard_fork }
     }
 
@@ -191,12 +166,12 @@ impl Protocol {
 
     /// Validate a transaction according to the current era's protocol rules.
     pub async fn validate_transaction(&self, tx: &crate::ledger::Transaction) -> bool {
-        self.hard_fork.era_logic.validate_transaction(tx)
+        self.hard_fork.validate_transaction(tx)
     }
 
     /// Validate a block according to the current era's protocol rules.
     pub async fn validate_block(&self, block: &crate::ledger::Block) -> bool {
-        self.hard_fork.era_logic.validate_block(block)
+        self.hard_fork.validate_block(block)
     }
 
     /// Handle protocol upgrades (hard forks).

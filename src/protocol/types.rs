@@ -6,9 +6,9 @@
 #[allow(dead_code)]
 pub trait ProtocolEra: Send + Sync {
     /// Returns the name of the era.
-    fn name(&self) -> &'static str { "" }
+    fn name(&self) -> &'static str;
     /// Validate a block for this era.
-    fn validate_block(&self, _block: &crate::ledger::Block) -> bool { false }
+    fn validate_block(&self, block: &crate::ledger::Block) -> bool;
     // Extend with shared protocol methods as needed
 }
 

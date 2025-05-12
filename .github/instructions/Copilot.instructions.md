@@ -43,3 +43,15 @@ This project is a modern, high-performance Cardano Node implementation in Rust.
 
 ---
 This file guides Copilot to generate secure, idiomatic, and maintainable Rust code for a Cardano Node, with a focus on performance, safety, and Cardano protocol correctness.
+Reference the  root [README.md](README.md) for project vision and architecture.
+https://github.com/IntersectMBO/cardano-node for the official Cardano Node repository.
+[]: # 
+[]: # - **Configuration Module:** Handles node configuration, command-line arguments, and environment variables.
+[]: # - **Networking Module:** Implements async P2P networking, peer discovery, block/tx propagation, and DoS resistance.
+[]: # - **Consensus Module:** Implements Ouroboros consensus (Praos and BFT), slot/epoch management, and leader election.
+[]: # - **Protocol Module:** Implements Cardano's multi-era protocol with a hard fork combinator.
+[]: # - **Ledger Module:** Implements the extended UTXO model, multi-asset support, and Plutus script hooks.
+[]: # - **Tracing Module:** Implements structured logging and tracing for all subsystems.
+[]: # - **Handlers Module:** Implements handlers for incoming blocks, transactions, and network events.
+[]: # - **Queries Module:** Implements APIs for querying the blockchain state and wallet operations.
+[]: # 

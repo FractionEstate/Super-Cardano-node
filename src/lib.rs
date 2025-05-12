@@ -7,7 +7,7 @@
 //!
 //! ## Features
 //! - Modular architecture: configuration, networking, consensus, protocol, ledger, tracing, handlers, queries, and more.
-//! - Cardano protocol support: Byron, Shelley, Alonzo, Conway eras.
+//! - Cardano protocol support: Byron, Shelley, Allegra, Mary, Alonzo, Babbage, Conway eras.
 //! - Ouroboros consensus algorithm (Praos, BFT, etc.).
 //! - Extended UTXO model.
 //! - Async/await networking with Tokio.

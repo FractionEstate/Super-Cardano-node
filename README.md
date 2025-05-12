@@ -17,7 +17,7 @@ Our mission: **deliver a robust, secure, and developer-friendly Cardano node tha
 - **Idiomatic Rust:** Leveraging Rust's safety, concurrency, and expressive type system.
 - **Strict Modularity:** Each subsystem—configuration, networking, consensus, protocol, ledger, tracing, handlers, queries, wallet—is a clear, documented module.
 - **Async/Await Everywhere:** All I/O and networking is async, powered by Tokio for massive scalability.
-- **Multi-Era Protocol:** Supports Byron, Shelley, Allegra, Mary, Alonzo, and Conway eras, with a hard fork combinator for seamless upgrades.
+- **Multi-Era Protocol:** Supports Byron, Shelley, Allegra, Mary, Alonzo, Babbage, and Conway eras, with a hard fork combinator for seamless upgrades.
 - **Ouroboros Consensus:** Implements Praos and BFT, with extensible hooks for future consensus research.
 - **Extended UTXO Model:** Full support for Cardano's EUTXO, multi-asset, and Plutus script hooks.
 - **Persistent ChainDB:** On-disk, async, rollback-capable database for blocks, UTXOs, and state.
@@ -25,6 +25,20 @@ Our mission: **deliver a robust, secure, and developer-friendly Cardano node tha
 - **Integrated Wallet:** Key management, address derivation, UTXO selection, transaction construction/signing, and API endpoints.
 - **Comprehensive Testing:** Unit, integration, and property-based tests for all critical logic.
 - **First-Class Documentation:** Every public API and protocol detail is documented with Rustdoc and inline comments.
+
+---
+
+## 🗂️ Cardano Eras Overview
+
+| Era     | Description                                                                 | Main Features Introduced                                  |
+|---------|-----------------------------------------------------------------------------|-----------------------------------------------------------|
+| Byron   | Cardano's original bootstrap era                                            | Classic UTXO, Ouroboros Classic, basic transactions       |
+| Shelley | Decentralization, staking, and delegation                                  | Ouroboros Praos, staking, delegation, rewards             |
+| Allegra | Timelocks and multi-asset groundwork                                       | Timelock scripts, multi-asset groundwork                  |
+| Mary    | Native multi-asset support                                                 | Multi-asset ledger, user-defined tokens                   |
+| Alonzo  | Smart contracts via Plutus                                                 | Plutus scripts, smart contracts, script validation        |
+| Babbage | Plutus V2, reference scripts, inline datums, reference inputs              | Improved smart contracts, new ledger features             |
+| Conway  | On-chain governance, advanced voting, protocol upgrades                    | Voltaire governance, DRep voting, protocol upgrades       |
 
 ---
 
@@ -43,7 +57,7 @@ Our mission: **deliver a robust, secure, and developer-friendly Cardano node tha
 
 - **Full Modular Architecture:** Each subsystem is a clear, documented module.
 - **Ouroboros Consensus:** Async/await-based Praos and BFT, slot/epoch management, leader election.
-- **Multi-Era Protocol:** Byron, Shelley, Allegra, Mary, Alonzo, Conway (with hard fork combinator).
+- **Multi-Era Protocol:** Byron, Shelley, Allegra, Mary, Alonzo, Babbage, Conway (with hard fork combinator).
 - **EUTXO Model:** Multi-asset, Plutus script hooks, and extensible transaction types.
 - **Networking:** Robust async P2P, peer discovery, block/tx propagation, DoS resistance.
 - **ChainDB:** On-disk, async, rollback-capable database for blocks, UTXOs, and state.
@@ -73,7 +87,7 @@ The Super Cardano Node is structured around a **multi-crate** approach within a 
 - **Idiomatic Rust:** The codebase is written in **Rust 2024 edition**, adhering to the latest language features and best practices. This ensures maximum performance, safety, and concurrency.
 - **Strict Modularity:** Each component is developed as a separate module with clear boundaries and responsibilities, facilitating easier maintenance and evolution.
 - **Async/Await Everywhere:** The entire I/O stack is asynchronous, using Rust's `async`/`await` syntax for non-blocking operations, backed by the **Tokio** runtime.
-- **Multi-Era Protocol Support:** The node natively understands and can switch between different Cardano eras (Byron, Shelley, Allegra, Mary, Alonzo, Conway), with a hard fork combinator seamlessly integrating changes.
+- **Multi-Era Protocol Support:** The node natively understands and can switch between different Cardano eras (Byron, Shelley, Allegra, Mary, Alonzo, Babbage, Conway), with a hard fork combinator seamlessly integrating changes.
 - **Ouroboros Consensus:** Implements the **Praos** and **BFT** variants of the Ouroboros consensus algorithm, with hooks for future extensibility.
 - **Extended UTXO Model:** Full support for Cardano's EUTXO model, including multi-asset support and Plutus script integration.
 - **Persistent ChainDB:** Utilizes an on-disk, asynchronous database for storing blockchain data, with support for rollbacks and fast sync.

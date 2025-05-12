@@ -28,6 +28,7 @@ use clap::Parser;
 use tokio::runtime::Runtime;
 use tokio::task;
 use tokio::net::TcpListener;
+use tokio::time::{sleep, Duration};
 
 use handlers::Handlers;
 use crate::tracing::Tracing;
@@ -85,17 +86,24 @@ fn main() -> Result<()> {
     let runtime = build_runtime_with_metrics(&config.runtime)?;
     
     runtime.block_on(async move {
-        // Initialize shared application state with better structure
         let app_state = initialize_app_state(
             &config, ledger, protocol, network, mempool, tracer.clone()
         ).await?;
-        
-        // Start services with dependency injection and lifecycle management
+
+        // Spawn a task to periodically check for protocol upgrades
+        let protocol_handle = app_state.protocol.clone();
+        task::spawn(async move {
+            let mut current_epoch = 0;
+            loop {
+                protocol_handle.lock().await.handle_upgrade(current_epoch).await;
+                current_epoch += 1;
+                sleep(Duration::from_secs(60)).await; // Check every minute
+            }
+        });
+
         let services = start_services(app_state.clone()).await?;
-        
-        // Set up graceful shutdown with proper cleanup
         setup_graceful_shutdown(app_state, services).await?;
-        
+
         Ok(())
     })?;
     
