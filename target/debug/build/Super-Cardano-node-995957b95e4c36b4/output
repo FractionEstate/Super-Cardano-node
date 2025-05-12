@@ -1,0 +1,2 @@
+cargo:rerun-if-changed=proto/chaindb.proto
+cargo:rerun-if-changed=proto

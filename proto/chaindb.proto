@@ -1,0 +1,54 @@
+syntax = "proto3";
+package chaindb;
+
+service ChainDBService {
+  rpc GetBlock (GetBlockRequest) returns (Block);
+  rpc GetUTXO (GetUTXORequest) returns (UTXOResponse);
+  rpc StreamBlocks (StreamBlocksRequest) returns (stream Block);
+  rpc StreamUTXOs (StreamUTXOsRequest) returns (stream UTXOEntry);
+}
+
+message GetBlockRequest { uint64 id = 1; }
+message GetUTXORequest { uint64 block_id = 1; uint64 tx_id = 2; uint32 index = 3; }
+message StreamBlocksRequest {}
+message StreamUTXOsRequest { uint64 block_id = 1; }
+
+message Block {
+  uint64 id = 1;
+  BlockHeader header = 2;
+  repeated Transaction transactions = 3;
+}
+
+message BlockHeader {
+  uint64 slot = 1;
+  uint64 epoch = 2;
+  string leader = 3;
+  bytes vrf_proof = 4;
+  bytes kes_signature = 5;
+}
+
+message Transaction {
+  uint64 id = 1;
+  repeated TxInput inputs = 2;
+  repeated TxOutput outputs = 3;
+}
+
+message TxInput {
+  uint64 prev_tx = 1;
+  uint32 index = 2;
+}
+
+message TxOutput {
+  string address = 1;
+  uint64 amount = 2;
+}
+
+message UTXOEntry {
+  uint64 tx_id = 1;
+  uint32 index = 2;
+  TxOutput output = 3;
+}
+
+message UTXOResponse {
+  TxOutput output = 1;
+}
