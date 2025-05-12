@@ -12,28 +12,33 @@ pub fn load_cli_args() -> Result<Configuration> {
         .arg(
             Arg::new("network")
                 .long("network")
-                .help("Specifies the network type")
-                ,
+                .help("Specifies the network type"),
         )
         .arg(
             Arg::new("port")
                 .long("port")
-                .help("Specifies the port to listen on")
-                ,
+                .help("Specifies the port to listen on"),
         )
         .get_matches();
 
     // Example: Parse CLI arguments into a Configuration struct
+    // TODO: Parse all CLI arguments and map to config fields as needed
+    let port = matches
+        .get_one::<String>("port")
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(3000);
+    let network = matches
+        .get_one::<String>("network")
+        .cloned()
+        .unwrap_or_else(|| "mainnet".to_string());
+
     let config = Configuration {
         network: NetworkConfig {
             listen_address: "0.0.0.0".to_string(),
-            port: matches
-                .get_one::<String>("port")
-                .map(|s| s.parse().unwrap_or(3000))
-                .unwrap_or(3000),
+            port,
             max_peers: 100,
-            bind_addr: "0.0.0.0:3000".to_string(),
-            discovery: "static".to_string(),
+            bind_addr: format!("0.0.0.0:{}", port),
+            discovery: network,
         },
         database: DatabaseConfig {
             path: "./data".to_string(),

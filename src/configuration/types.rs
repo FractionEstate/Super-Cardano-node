@@ -1,3 +1,10 @@
+impl Configuration {
+    pub fn merge(self, other: Self) -> Self {
+        // Naive merge: prefer non-defaults from `other` over `self`
+        // (real logic should be more sophisticated)
+        other
+    }
+}
 /// Peer discovery method for networking.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum DiscoveryMethod {
@@ -14,6 +21,26 @@ pub struct Configuration {
     pub database: DatabaseConfig,
     pub consensus: ConsensusConfig,
     pub logging: LoggingConfig,
+}
+
+impl Default for Configuration {
+    fn default() -> Self {
+        Self {
+            network: NetworkConfig::default(),
+            database: DatabaseConfig {
+                path: "./data/chaindb".to_string(),
+                cache_size: 1024,
+            },
+            consensus: ConsensusConfig {
+                protocol: "OuroborosPraos".to_string(),
+                slot_duration: 1000,
+            },
+            logging: LoggingConfig {
+                level: "info".to_string(),
+                file: None,
+            },
+        }
+    }
 }
 
 /// Network-related configuration.

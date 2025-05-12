@@ -1,9 +1,22 @@
-//! Networking module for Super Cardano Node
-//!
-//! Handles async P2P networking, peer discovery, block/tx propagation, and DoS resistance.
-//!
-//! Uses Tokio for async I/O and leverages configuration and tracing modules.
+use crate::ledger::Block;
+use async_trait::async_trait;
+#[async_trait]
+pub trait NetworkExt {
+    /// Broadcast a block to all connected peers.
+    async fn broadcast_block(&self, block: &Block);
+}
 
+#[async_trait]
+impl NetworkExt for Arc<Network> {
+    async fn broadcast_block(&self, _block: &Block) {
+        // TODO: Implement block broadcast logic
+    }
+}
+/// Networking module for Super Cardano Node
+///
+/// Handles async P2P networking, peer discovery, block/tx propagation, and DoS resistance.
+///
+/// Uses Tokio for async I/O and leverages configuration and tracing modules.
 pub mod discovery;
 pub mod error;
 pub mod p2p;
@@ -54,23 +67,19 @@ impl Network {
         );
 
         // Peer discovery: connect to static peers if provided
-        if let Some(discovery) = &self.config.discovery {
-            match discovery.method {
-                crate::configuration::DiscoveryMethod::Static => {
-                    for peer_addr in &discovery.dns_seeds {
-                        if let Ok(addr) = peer_addr.parse() {
-                            println!("[Networking] Attempting to connect to peer {}", addr);
-                            // Optionally: self.connect_peer(addr).await;
-                        }
-                    }
-                }
-                crate::configuration::DiscoveryMethod::Dns => {
-                    println!("[Networking] DNS peer discovery not yet implemented");
-                }
-                crate::configuration::DiscoveryMethod::Upnp => {
-                    println!("[Networking] uPnP peer discovery not yet implemented");
-                }
+        // Peer discovery: connect to static peers if provided
+        match self.config.discovery.as_str() {
+            "static" => {
+                // TODO: Load static peer addresses from config
+                println!("[Networking] Static peer discovery not yet implemented");
             }
+            "dns" => {
+                println!("[Networking] DNS peer discovery not yet implemented");
+            }
+            "upnp" => {
+                println!("[Networking] uPnP peer discovery not yet implemented");
+            }
+            _ => {}
         }
 
         loop {

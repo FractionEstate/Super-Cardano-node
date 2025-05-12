@@ -1,27 +1,31 @@
-//! Hard Fork Combinator for Super Cardano Node
-//!
-//! Manages transitions between different Cardano protocol eras.
-
+/// Hard Fork Combinator for Super Cardano Node
+///
+/// Manages transitions between different Cardano protocol eras.
 use crate::protocol::{Era, EraLogic};
 use std::collections::BTreeMap;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct HardForkTransition {
     pub era: Era,
     pub activation_epoch: u64,
-    pub logic: Box<dyn EraLogic>,
+    pub logic: Arc<dyn EraLogic + Send + Sync>,
 }
 
 /// Manages era transitions and delegates validation logic to the current era.
 pub struct HardForkCombinator {
     current_era: Era,
-    current_logic: Box<dyn EraLogic>,
+    current_logic: Arc<dyn EraLogic + Send + Sync>,
     transitions: BTreeMap<u64, HardForkTransition>,
 }
 
 impl HardForkCombinator {
+    /// Returns a clone of the current era logic as an Arc trait object.
+    pub fn current_logic(&self) -> Arc<dyn EraLogic + Send + Sync> {
+        Arc::clone(&self.current_logic)
+    }
     /// Initialize the combinator with the initial era.
-    pub fn new(initial_era: Era, initial_logic: Box<dyn EraLogic>) -> Self {
+    pub fn new(initial_era: Era, initial_logic: Arc<dyn EraLogic + Send + Sync>) -> Self {
         Self {
             current_era: initial_era,
             current_logic: initial_logic,
@@ -30,8 +34,20 @@ impl HardForkCombinator {
     }
 
     /// Schedule a new era transition.
-    pub fn schedule_transition(&mut self, epoch: u64, era: Era, logic: Box<dyn EraLogic>) {
-        self.transitions.insert(epoch, HardForkTransition { era, activation_epoch: epoch, logic });
+    pub fn schedule_transition(
+        &mut self,
+        epoch: u64,
+        era: Era,
+        logic: Arc<dyn EraLogic + Send + Sync>,
+    ) {
+        self.transitions.insert(
+            epoch,
+            HardForkTransition {
+                era,
+                activation_epoch: epoch,
+                logic,
+            },
+        );
     }
 
     /// Check and perform era transition if needed.
@@ -39,16 +55,13 @@ impl HardForkCombinator {
         if let Some((&epoch, transition)) = self.transitions.iter().next() {
             if current_epoch >= epoch {
                 self.current_era = transition.era.clone();
-                self.current_logic = transition.logic.clone();
+                self.current_logic = Arc::clone(&transition.logic);
                 self.transitions.remove(&epoch);
             }
         }
     }
 
-    /// Delegate transaction validation to the current era logic.
-    pub fn validate_transaction(&self, tx: &crate::ledger::Transaction) -> bool {
-        self.current_logic.validate_transaction(tx)
-    }
+    // NOTE: validate_transaction is not used directly anymore; see Protocol wrapper
 
     /// Delegate block validation to the current era logic.
     pub fn validate_block(&self, block: &crate::ledger::Block) -> bool {
