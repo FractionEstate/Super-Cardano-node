@@ -3,18 +3,34 @@
 //! Handles transaction pool, relay, and validation logic.
 
 use crate::ledger::Transaction;
-use std::collections::{VecDeque};
+use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
 /// Represents the node's mempool (transaction pool).
 #[derive(Clone)]
 pub struct Mempool {
+    /// The pool of pending transactions.
     pool: Arc<Mutex<VecDeque<Transaction>>>,
+    /// Maximum number of transactions allowed in the mempool.
     max_size: usize,
 }
 
 impl Mempool {
+    /// Returns a context object for compatibility (stub).
+    ///
+    /// # Example
+    /// ```
+    /// let mempool = Mempool::new(100);
+    /// let ctx = mempool.context();
+    /// ```
+    pub fn context(&self) -> () {
+        // TODO: Replace with real context type if needed
+    }
+
     /// Create a new mempool with a maximum size.
+    ///
+    /// # Arguments
+    /// * `max_size` - The maximum number of transactions the mempool can hold.
     pub fn new(max_size: usize) -> Self {
         Self {
             pool: Arc::new(Mutex::new(VecDeque::new())),
@@ -22,7 +38,9 @@ impl Mempool {
         }
     }
 
-    /// Add a transaction to the mempool (returns false if full).
+    /// Add a transaction to the mempool.
+    ///
+    /// Returns `false` if the mempool is full.
     pub fn add_transaction(&self, tx: Transaction) -> bool {
         let mut pool = self.pool.lock().unwrap();
         if pool.len() >= self.max_size {
@@ -38,8 +56,8 @@ impl Mempool {
         pool.iter().cloned().collect()
     }
 
-    #[allow(dead_code)]
     /// Remove a transaction from the mempool by id.
+    #[allow(dead_code)]
     pub fn remove_transaction(&self, tx_id: u64) {
         let mut pool = self.pool.lock().unwrap();
         if let Some(pos) = pool.iter().position(|tx| tx.id == tx_id) {
@@ -57,7 +75,7 @@ impl Mempool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ledger::{TxOutput};
+    use crate::ledger::TxOutput;
 
     #[test]
     fn mempool_add_and_remove() {
@@ -65,14 +83,22 @@ mod tests {
         let tx1 = Transaction {
             id: 1,
             inputs: vec![],
-            outputs: vec![TxOutput { address: "A".to_string(), amount: 10, assets: None }],
+            outputs: vec![TxOutput {
+                address: "A".to_string(),
+                amount: 10,
+                assets: None,
+            }],
             certificates: vec![],
             plutus_witnesses: vec![],
         };
         let tx2 = Transaction {
             id: 2,
             inputs: vec![],
-            outputs: vec![TxOutput { address: "B".to_string(), amount: 20, assets: None }],
+            outputs: vec![TxOutput {
+                address: "B".to_string(),
+                amount: 20,
+                assets: None,
+            }],
             certificates: vec![],
             plutus_witnesses: vec![],
         };

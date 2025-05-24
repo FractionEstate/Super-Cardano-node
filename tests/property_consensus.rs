@@ -1,8 +1,8 @@
 //! Property-based tests for consensus and networking in Super Cardano Node
 
 use proptest::prelude::*;
-use Super_Cardano_node::ledger::{Transaction, TxInput, TxOutput};
-use Super_Cardano_node::mempool::Mempool;
+use crate::ledger::{Transaction, TxInput, TxOutput};
+use crate::mempool::Mempool;
 
 // Local wrapper for Transaction to allow Arbitrary impl
 #[derive(Debug, Clone)]

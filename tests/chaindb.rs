@@ -1,7 +1,7 @@
 //! Integration test for ChainDB persistence, rollback, and recovery
 
-use Super_Cardano_node::ledger::{Ledger, Block, Transaction};
-use Super_Cardano_node::chaindb::ChainDB;
+use crate::ledger::{Ledger, Block, Transaction};
+use crate::chaindb::ChainDB;
 use tokio::runtime::Runtime;
 use std::fs;
 

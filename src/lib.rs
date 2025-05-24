@@ -1,3 +1,5 @@
+pub mod app_state;
+pub mod services;
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 #![allow(unused)]
@@ -14,6 +16,7 @@
 //! - Secure, testable, and extensible codebase.
 //!
 //! ## Usage Example
+<<<<<<< HEAD
 //! ```rust,ignore
 //! // Pseudocode example (fields omitted for brevity)
 //! use Super_Cardano_node::configuration::Config;
@@ -22,6 +25,12 @@
 //! // let config = Config { /* ... */ };
 //! // let ledger = Ledger::default();
 //! // let protocol = Protocol::default();
+=======
+//! ```rust
+//! use crate::configuration::Config;
+//! use crate::ledger::Ledger;
+//! use crate::protocol::Protocol;
+>>>>>>> 66fbaab447f7efd00cc320b3ede5045eb66a5e38
 //! // ...
 //! ```
 //!
@@ -62,6 +71,7 @@
 mod tests {
     // Removed: use super::*;
     // Fix test import: use crate::configuration::{...} for correct path in integration tests
+<<<<<<< HEAD
     // NOTE: This test is illustrative and will not compile unless all struct fields are provided.
     // #[test]
     // fn test_config_validation() {
@@ -72,21 +82,42 @@ mod tests {
     //     };
     //     assert!(config.validate());
     // }
+=======
+    use crate::configuration::{Config, ConsensusConfig, NetworkConfig, ProtocolConfig};
+
+    #[test]
+    fn test_config_validation() {
+        let config = Config {
+            network: NetworkConfig {
+                bind_addr: "127.0.0.1:3001".to_string(),
+                max_peers: 8,
+                discovery: None,
+            },
+            consensus: ConsensusConfig {
+                protocol: "Ouroboros".to_string(),
+            },
+            protocol: ProtocolConfig {
+                era: "Shelley".to_string(),
+            },
+        };
+        assert!(config.validate());
+    }
+>>>>>>> 66fbaab447f7efd00cc320b3ede5045eb66a5e38
 }
 
+pub mod api;
+pub mod chaindb;
 pub mod configuration;
 pub mod consensus;
 pub mod handlers;
 pub mod ledger;
 pub mod mempool;
 pub mod networking;
+pub mod proto_convert;
 pub mod protocol;
 pub mod queries;
 pub mod tracing;
-pub mod chaindb;
-pub mod proto_convert;
 pub mod wallet;
-pub mod api;
 
 pub mod chaindb_proto {
     tonic::include_proto!("chaindb");

@@ -10,22 +10,23 @@
 //! # Usage Example
 //! ```rust,ignore
 //! // This example requires an async context and a real Block/LedgerState
-//! // use Super_Cardano_node::chaindb::ChainDB;
+//! // use crate::chaindb::ChainDB;
 //! // let mut db = ChainDB::open("./data/chaindb").await.unwrap();
 //! // db.append_block(&block, &state).await.unwrap();
 //! ```
 
 use crate::ledger::{Block, LedgerState};
-use serde::{Serialize, Deserialize};
+use futures::Stream;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use std::pin::Pin;
+use std::sync::Arc;
 use tokio::fs;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::RwLock;
-use std::sync::Arc;
-use std::pin::Pin;
-use futures::Stream;
 
 /// Persistent chain database for blocks and ledger state.
+#[derive(Debug)]
 pub struct ChainDB {
     path: PathBuf,
 }
@@ -42,7 +43,11 @@ impl ChainDB {
     }
 
     /// Append a block and update the ledger state atomically.
-    pub async fn append_block(&mut self, block: &Block, state: &LedgerState) -> std::io::Result<()> {
+    pub async fn append_block(
+        &mut self,
+        block: &Block,
+        state: &LedgerState,
+    ) -> std::io::Result<()> {
         let block_path = self.path.join(format!("block_{}.json", block.id));
         let state_path = self.path.join(format!("state_{}.json", block.id));
         let block_data = serde_json::to_vec(block).unwrap();
@@ -95,7 +100,12 @@ impl ChainDB {
             let fname = entry.file_name();
             let fname = fname.to_string_lossy();
             if fname.starts_with("block_") && fname.ends_with(".json") {
-                if let Some(num) = fname.trim_start_matches("block_").trim_end_matches(".json").parse::<u64>().ok() {
+                if let Some(num) = fname
+                    .trim_start_matches("block_")
+                    .trim_end_matches(".json")
+                    .parse::<u64>()
+                    .ok()
+                {
                     ids.push(num);
                 }
             }
@@ -105,7 +115,9 @@ impl ChainDB {
     }
 
     /// Stream all blocks from the database in order (async iterator).
-    pub async fn stream_blocks(&self) -> std::io::Result<Pin<Box<dyn Stream<Item = Block> + Send + '_>>> {
+    pub async fn stream_blocks(
+        &self,
+    ) -> std::io::Result<Pin<Box<dyn Stream<Item = Block> + Send + '_>>> {
         use futures::stream::{self, StreamExt};
         let ids = self.block_ids().await?;
         let this = self;
@@ -116,13 +128,21 @@ impl ChainDB {
     }
 
     /// Query a UTXO by (tx_id, index) at a given block id.
-    pub async fn query_utxo(&self, block_id: u64, tx_id: u64, index: u32) -> std::io::Result<Option<crate::ledger::TxOutput>> {
+    pub async fn query_utxo(
+        &self,
+        block_id: u64,
+        tx_id: u64,
+        index: u32,
+    ) -> std::io::Result<Option<crate::ledger::TxOutput>> {
         let state = self.load_state(block_id).await?;
         Ok(state.utxos.get(&(tx_id, index)).cloned())
     }
 
     /// Query the full UTXO set at a given block id.
-    pub async fn query_utxo_set(&self, block_id: u64) -> std::io::Result<std::collections::HashMap<(u64, u32), crate::ledger::TxOutput>> {
+    pub async fn query_utxo_set(
+        &self,
+        block_id: u64,
+    ) -> std::io::Result<std::collections::HashMap<(u64, u32), crate::ledger::TxOutput>> {
         let state = self.load_state(block_id).await?;
         Ok(state.utxos)
     }
@@ -133,15 +153,27 @@ impl ChainDB {
         self.load_block(id).await
     }
     /// Example: Get UTXO by (tx_id, index) at a given block id
-    pub async fn api_get_utxo(&self, block_id: u64, tx_id: u64, index: u32) -> std::io::Result<Option<crate::ledger::TxOutput>> {
+    pub async fn api_get_utxo(
+        &self,
+        block_id: u64,
+        tx_id: u64,
+        index: u32,
+    ) -> std::io::Result<Option<crate::ledger::TxOutput>> {
         self.query_utxo(block_id, tx_id, index).await
     }
     /// Example: Stream all blocks (for sync or explorer)
-    pub async fn api_stream_blocks(&self) -> std::io::Result<Pin<Box<dyn Stream<Item = Block> + Send + '_>>> {
+    pub async fn api_stream_blocks(
+        &self,
+    ) -> std::io::Result<Pin<Box<dyn Stream<Item = Block> + Send + '_>>> {
         self.stream_blocks().await
     }
     /// Example: Stream all UTXOs at a given block id
-    pub async fn api_stream_utxos(&self, block_id: u64) -> std::io::Result<Pin<Box<dyn Stream<Item = ((u64, u32), crate::ledger::TxOutput)> + Send + '_>>> {
+    pub async fn api_stream_utxos(
+        &self,
+        block_id: u64,
+    ) -> std::io::Result<
+        Pin<Box<dyn Stream<Item = ((u64, u32), crate::ledger::TxOutput)> + Send + '_>>,
+    > {
         let utxos = self.query_utxo_set(block_id).await?;
         use futures::stream;
         Ok(Box::pin(stream::iter(utxos.into_iter())))

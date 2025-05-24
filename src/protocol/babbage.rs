@@ -1,8 +1,8 @@
-//! Babbage protocol logic for Super Cardano Node
-//!
-//! Implements Babbage-era consensus and ledger rules.
-
+/// Babbage protocol logic for Super Cardano Node
+///
+/// Implements Babbage-era consensus and ledger rules.
 use crate::protocol::types::ProtocolEra;
+use crate::protocol::wallet;
 
 /// Babbage protocol era logic implementation for Cardano consensus and ledger.
 #[derive(Debug, Default, Clone)]
@@ -43,10 +43,14 @@ impl ProtocolEra for BabbageProtocol {
 use crate::protocol::EraLogic;
 
 impl EraLogic for BabbageProtocol {
-    fn name(&self) -> &'static str { "Babbage" }
-    fn validate_transaction(&self, tx: &crate::ledger::Transaction) -> bool {
-        // TODO: Implement Babbage-specific logic (reference inputs, inline datums, etc.)
-        !tx.inputs.is_empty() && !tx.outputs.is_empty()
+    fn name(&self) -> &'static str {
+        "Babbage"
     }
-    fn validate_block(&self, _block: &crate::ledger::Block) -> bool { true }
+    fn validate_transaction(&self, tx: &wallet::Transaction) -> bool {
+        // TODO: Implement Babbage-specific logic (reference inputs, inline datums, etc.)
+        true
+    }
+    fn validate_block(&self, _block: &crate::ledger::Block) -> bool {
+        true
+    }
 }

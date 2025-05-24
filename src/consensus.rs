@@ -1,16 +1,22 @@
-//! Consensus module for Super Cardano Node
-//!
-//! Implements the Ouroboros consensus algorithm and related logic.
-//! All consensus code must be robust, secure, and performant.
-
+impl Consensus {
+    /// Returns a context object for compatibility (stub).
+    pub fn context(&self) -> () {
+        // TODO: Replace with real context type if needed
+    }
+}
+/// Consensus module for Super Cardano Node
+///
+/// Implements the Ouroboros consensus algorithm and related logic.
+/// All consensus code must be robust, secure, and performant.
 use crate::configuration::ConsensusConfig;
 use crate::mempool::Mempool;
-use crate::tracing::tracers::{Tracer, TraceEvent};
+use crate::networking::NetworkExt;
+use crate::tracing::tracers::{TraceEvent, Tracer};
 use rand::Rng;
 use std::sync::Arc;
 use std::time::Instant;
 use tokio::sync::Mutex as AsyncMutex;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 /// Represents the consensus engine of the node.
 #[allow(dead_code)]
@@ -85,7 +91,13 @@ pub struct ConsensusState {
 
 impl ConsensusState {
     /// Initialize consensus state
-    pub fn new(slots_per_epoch: u64, praos_keys: PraosKeys, stake: f64, total_stake: f64, kes_rotation_interval: u64) -> Self {
+    pub fn new(
+        slots_per_epoch: u64,
+        praos_keys: PraosKeys,
+        stake: f64,
+        total_stake: f64,
+        kes_rotation_interval: u64,
+    ) -> Self {
         Self {
             slot: 0,
             epoch: 0,
@@ -124,7 +136,11 @@ pub struct PraosState {
 impl Consensus {
     /// Create a new consensus engine with the given configuration.
     pub fn new(config: ConsensusConfig, tracer: Tracer) -> Self {
-        Self { config, mempool: None, tracer }
+        Self {
+            config,
+            mempool: None,
+            tracer,
+        }
     }
 
     /// Start the consensus engine asynchronously.
@@ -139,7 +155,10 @@ impl Consensus {
             // Simulate leader election (random for now)
             let is_leader = rand::rng().random_bool(0.1); // 10% chance
             if is_leader {
-                println!("[Consensus] Slot {}: Node is leader, producing block...", slot);
+                println!(
+                    "[Consensus] Slot {}: Node is leader, producing block...",
+                    slot
+                );
                 // In real code, produce and broadcast block
             } else {
                 println!("[Consensus] Slot {}: Not leader", slot);
@@ -186,8 +205,13 @@ impl Consensus {
             if txs.is_empty() {
                 return None;
             }
-            let valid_txs: Vec<_> = txs.into_iter()
-                .filter(|tx| futures::executor::block_on(ledger.validate_transaction_with_protocol(tx, protocol)))
+            let valid_txs: Vec<_> = txs
+                .into_iter()
+                .filter(|tx| {
+                    futures::executor::block_on(
+                        ledger.validate_transaction_with_protocol(tx, protocol),
+                    )
+                })
                 .collect();
             if valid_txs.is_empty() {
                 return None;
@@ -203,7 +227,9 @@ impl Consensus {
                 },
                 transactions: valid_txs,
             };
-            self.tracer.trace(TraceEvent::LeadershipCheck("Checked leadership".to_string()));
+            self.tracer.trace(TraceEvent::LeadershipCheck(
+                "Checked leadership".to_string(),
+            ));
             Some(block)
         } else {
             None
@@ -232,7 +258,10 @@ impl Consensus {
                 current_epoch += 1;
                 let mut protocol_guard = protocol.lock().await;
                 protocol_guard.handle_upgrade(current_epoch).await;
-                println!("[Consensus] Checked for protocol upgrade at epoch {}", current_epoch);
+                println!(
+                    "[Consensus] Checked for protocol upgrade at epoch {}",
+                    current_epoch
+                );
             }
             // Era-aware leader election: round-robin by node_id (can be extended per era)
             let is_leader = (slot % total_nodes) == node_id;
@@ -240,7 +269,7 @@ impl Consensus {
                 let mut ledger_guard = ledger.lock().await;
                 let protocol_guard = protocol.lock().await;
                 let mempool_ref = mempool.lock().await;
-                let era_logic = protocol_guard.hard_fork.era_logic.as_ref();
+                let era_logic = protocol_guard.hard_fork.current_logic();
                 // Fill consensus header fields for block production
                 let slot = slot; // current slot
                 let epoch = current_epoch;
@@ -249,14 +278,16 @@ impl Consensus {
                 let kes_signature = vec![0u8; 32]; // stub
                 if let Some(block) = crate::ledger::Block::new_from_mempool(
                     &mut *ledger_guard,
-                    era_logic,
+                    era_logic.as_ref(),
                     &*mempool_ref,
                     slot,
                     epoch,
                     leader,
                     vrf_proof,
                     kes_signature,
-                ).await {
+                )
+                .await
+                {
                     if protocol_guard.validate_block(&block).await {
                         ledger_guard.apply_block(&block);
                         network.broadcast_block(&block).await;
@@ -290,12 +321,17 @@ impl Consensus {
                 // TODO: update stake distribution, rotate KES, etc.
             }
             // Praos leader check
-            if praos_is_leader(slot, &praos_state.keys, praos_state.stake, praos_state.total_stake) {
+            if praos_is_leader(
+                slot,
+                &praos_state.keys,
+                praos_state.stake,
+                praos_state.total_stake,
+            ) {
                 let mut ledger_guard = ledger.lock().await;
                 let protocol_guard = protocol.clone();
                 // Fix: lock mempool and use era_logic for correct trait and argument types
                 let mempool_ref = mempool.lock().await;
-                let era_logic = protocol_guard.hard_fork.era_logic.as_ref();
+                let era_logic = protocol_guard.hard_fork.current_logic();
                 // Fill consensus header fields for block production
                 let slot = slot; // current slot
                 let epoch = _epoch;
@@ -304,14 +340,16 @@ impl Consensus {
                 let kes_signature = vec![0u8; 32]; // stub
                 if let Some(block) = crate::ledger::Block::new_from_mempool(
                     &mut *ledger_guard,
-                    era_logic,
+                    era_logic.as_ref(),
                     &*mempool_ref,
                     slot,
                     epoch,
                     leader,
                     vrf_proof,
                     kes_signature,
-                ).await {
+                )
+                .await
+                {
                     if protocol_guard.validate_block(&block).await {
                         ledger_guard.apply_block(&block);
                         network.broadcast_block(&block).await;
@@ -321,7 +359,8 @@ impl Consensus {
             slot += 1;
             let elapsed = slot_start.elapsed();
             if elapsed < std::time::Duration::from_millis(slot_duration_ms) {
-                tokio::time::sleep(std::time::Duration::from_millis(slot_duration_ms) - elapsed).await;
+                tokio::time::sleep(std::time::Duration::from_millis(slot_duration_ms) - elapsed)
+                    .await;
             }
         }
     }
@@ -352,20 +391,22 @@ impl Consensus {
                 let mut ledger_guard = ledger.lock().await;
                 let protocol_guard = protocol.clone();
                 let mempool_ref = mempool.lock().await;
-                let era_logic = protocol_guard.hard_fork.era_logic.as_ref();
+                let era_logic = protocol_guard.hard_fork.current_logic();
                 let leader = format!("node-{}", node_id);
                 let vrf_proof = vec![0u8; 32]; // stub
                 let kes_signature = vec![0u8; 32]; // stub
                 if let Some(block) = crate::ledger::Block::new_from_mempool(
                     &mut *ledger_guard,
-                    era_logic,
+                    era_logic.as_ref(),
                     &*mempool_ref,
                     state.slot,
                     state.epoch,
                     leader,
                     vrf_proof,
                     kes_signature,
-                ).await {
+                )
+                .await
+                {
                     if protocol_guard.validate_block(&block).await {
                         ledger_guard.apply_block(&block);
                         network.broadcast_block(&block).await;
@@ -384,9 +425,9 @@ impl Consensus {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::configuration::ConsensusConfig;
     use crate::ledger::{Block, BlockHeader, Transaction, TxInput, TxOutput};
     use crate::tracing::tracers::Tracer;
-    use crate::configuration::ConsensusConfig;
 
     #[test]
     fn test_consensus_state_slot_epoch_kes() {

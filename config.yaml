@@ -1,0 +1,16 @@
+network:
+  listen_address: "0.0.0.0"
+  port: 3000
+  max_peers: 100
+
+database:
+  path: "./data"
+  cache_size: 1024
+
+consensus:
+  protocol: "Ouroboros"
+  slot_duration: 1000
+
+logging:
+  level: "info"
+  file: null

@@ -27,7 +27,7 @@ impl Handlers {
     /// # Example: Register signals
     /// ```rust,ignore
     /// // This function is async and must be called in an async context
-    /// // use Super_Cardano_node::handlers::Handlers;
+    /// // use crate::handlers::Handlers;
     /// // Handlers::register_signals().await;
     /// ```
     pub async fn register_signals() {

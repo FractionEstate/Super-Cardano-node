@@ -1,4 +1,4 @@
-use super_cardano_node::protocol::{Era, HardForkCombinator, ByronEra, ShelleyEra};
+use crate::protocol::{Era, HardForkCombinator, ByronEra, ShelleyEra};
 
 #[test]
 fn test_hard_fork_transition() {

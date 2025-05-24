@@ -1,6 +1,6 @@
 //! Example: Application integration with ChainDB public API
 
-use Super_Cardano_node::chaindb::{ChainDB, SharedChainDB};
+use crate::chaindb::{ChainDB, SharedChainDB};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tokio::runtime::Runtime;
@@ -10,7 +10,7 @@ fn test_application_api_usage() {
     let rt = Runtime::new().unwrap();
     rt.block_on(async {
         let _ = std::fs::remove_dir_all("./testdata/chaindb");
-        let mut ledger = Super_Cardano_node::ledger::Ledger::new(Default::default());
+        let mut ledger = crate::ledger::Ledger::new(Default::default());
         let mut db = ChainDB::open("./testdata/chaindb").await.unwrap();
         let _tx = Super_Cardano_node::ledger::Transaction::default();
         let block = Super_Cardano_node::ledger::Block {

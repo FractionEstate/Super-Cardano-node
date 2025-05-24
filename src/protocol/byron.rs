@@ -60,8 +60,8 @@ impl ByronProtocol {
     ///
     /// Example usage for Byron transaction validation
     /// ```rust
-    /// use Super_Cardano_node::ledger::Transaction;
-    /// use Super_Cardano_node::protocol::byron::{ByronConfig, ByronProtocol};
+    /// use crate::ledger::Transaction;
+    /// use crate::protocol::byron::{ByronConfig, ByronProtocol};
     /// let tx = Transaction::default();
     /// let cfg = ByronConfig::default();
     /// let valid = ByronProtocol::validate_transaction(&tx, &cfg);
@@ -80,8 +80,8 @@ impl ByronProtocol {
     ///
     /// Example usage for Byron block validation
     /// ```rust
-    /// use Super_Cardano_node::ledger::Block;
-    /// use Super_Cardano_node::protocol::byron::{ByronConfig, ByronProtocol};
+    /// use crate::ledger::Block;
+    /// use crate::protocol::byron::{ByronConfig, ByronProtocol};
     /// let block = Block::default();
     /// let cfg = ByronConfig::default();
     /// let valid = ByronProtocol::validate_block(&block, &cfg);
