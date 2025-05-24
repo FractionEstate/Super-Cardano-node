@@ -3,38 +3,51 @@
 //! Handles querying node status, chain state, peer list, and mempool.
 //! Provides APIs for monitoring and external tools.
 
-#[allow(dead_code)]
 /// Node state information.
+///
+/// Contains information about the current tip and node uptime.
 #[derive(Debug, Clone)]
 pub struct NodeState {
+    /// Current tip of the blockchain.
     pub tip: String,
+    /// Node uptime in seconds.
     pub uptime_secs: u64,
 }
 
-#[allow(dead_code)]
 /// Chain state information.
+///
+/// Contains information about the current epoch and slot.
 #[derive(Debug, Clone)]
 pub struct ChainState {
+    /// Current epoch number.
     pub epoch: u64,
+    /// Current slot number.
     pub slot: u64,
 }
 
-#[allow(dead_code)]
 /// Peer information.
+///
+/// Contains the address of a connected peer.
 #[derive(Debug, Clone)]
 pub struct PeerInfo {
+    /// Peer address.
     pub address: String,
 }
 
-#[allow(dead_code)]
 /// Mempool state information.
+///
+/// Contains the number of transactions and total size in bytes.
 #[derive(Debug, Clone)]
 pub struct MempoolState {
+    /// Number of transactions in the mempool.
     pub tx_count: usize,
+    /// Total size of transactions in bytes.
     pub size_bytes: usize,
 }
 
-#[allow(dead_code)]
+/// Query interface for node, chain, peer, and mempool state.
+///
+/// Provides static methods for querying various aspects of node state.
 pub struct Queries;
 
 impl Queries {

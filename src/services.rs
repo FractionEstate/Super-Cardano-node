@@ -1,3 +1,7 @@
+//! Service manager for Super Cardano Node
+//!
+//! Coordinates the startup and shutdown of all major network and API services.
+
 use anyhow::{Context, Result};
 use futures::future::try_join_all;
 use std::net::SocketAddr;
@@ -11,12 +15,24 @@ use crate::app_state::SharedAppState;
 use crate::api::rest_router;
 use crate::api_grpc::start_grpc_server;
 
+/// Manages the lifecycle of all node services (networking, consensus, APIs, metrics).
+///
+/// Holds references to the shared application state and manages async service handles.
+///
+/// # Example
+/// ```
+/// let mut manager = ServiceManager::new(app_state.clone());
+/// manager.start_all().await.unwrap();
+/// ```
 pub struct ServiceManager {
+    /// Shared application state.
     app_state: SharedAppState,
+    /// Handles to running async services.
     handles: Vec<JoinHandle<Result<()>>>,
 }
 
 impl ServiceManager {
+    /// Create a new service manager.
     pub fn new(app_state: SharedAppState) -> Self {
         Self {
             app_state,
@@ -24,7 +40,12 @@ impl ServiceManager {
         }
     }
 
-    /// Start all network services
+    /// Start all network and API services.
+    ///
+    /// Starts networking, consensus, REST API, gRPC API, and metrics services as needed.
+    ///
+    /// # Errors
+    /// Returns an error if any service fails to start.
     pub async fn start_all(&mut self) -> Result<()> {
         // Start networking service
         self.start_network_service().await?;

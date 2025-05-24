@@ -16,15 +16,27 @@ use serde::Deserialize;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-// --- REST API ---
-
+/// Application state for API handlers.
+///
+/// Holds references to the shared chain database and wallet list.
+#[derive(Debug, Clone)]
 pub struct AppState {
+    /// Shared chain database.
     pub db: SharedChainDB,
+    /// List of shared wallets.
     pub wallets: Arc<RwLock<Vec<wallet::SharedWallet>>>,
 }
+
+/// Shared application state type alias for API handlers.
 pub type SharedAppState = Arc<RwLock<AppState>>;
 
 /// Build the REST API router for ChainDB.
+///
+/// # Arguments
+/// * `app_state` - Shared application state for handlers.
+///
+/// # Returns
+/// An Axum `Router` with all REST endpoints registered.
 pub fn rest_router(app_state: SharedAppState) -> Router {
     Router::new()
         .route("/block/:id", get(get_block))
@@ -100,6 +112,13 @@ async fn stream_utxos(
 }
 
 /// Create a new wallet
+///
+/// # Arguments
+/// * `app_state` - Shared application state for handlers.
+/// * `req` - JSON payload with the wallet name.
+///
+/// # Returns
+/// A JSON response with the created wallet data.
 pub async fn create_wallet(State(app_state): State<SharedAppState>, Json(req): Json<CreateWalletRequest>) -> Json<wallet::Wallet> {
     let mut state = app_state.write().await;
     let wallet = wallet::Wallet::create(&req.name).await;
@@ -109,6 +128,13 @@ pub async fn create_wallet(State(app_state): State<SharedAppState>, Json(req): J
 }
 
 /// Get wallet balance
+///
+/// # Arguments
+/// * `app_state` - Shared application state for handlers.
+/// * `idx` - Wallet index in the shared wallet list.
+///
+/// # Returns
+/// A JSON response with the wallet balance.
 pub async fn get_wallet_balance(State(app_state): State<SharedAppState>, Path(idx): Path<usize>) -> Json<u64> {
     let state = app_state.read().await;
     let wallets = state.wallets.read().await;
@@ -118,6 +144,13 @@ pub async fn get_wallet_balance(State(app_state): State<SharedAppState>, Path(id
 }
 
 /// Derive a new address
+///
+/// # Arguments
+/// * `app_state` - Shared application state for handlers.
+/// * `idx` - Wallet index in the shared wallet list.
+///
+/// # Returns
+/// A JSON response with the derived address.
 pub async fn derive_wallet_address(State(app_state): State<SharedAppState>, Path(idx): Path<usize>) -> Json<String> {
     let state = app_state.read().await;
     let wallets = state.wallets.read().await;
@@ -128,6 +161,14 @@ pub async fn derive_wallet_address(State(app_state): State<SharedAppState>, Path
 }
 
 /// Build a transaction
+///
+/// # Arguments
+/// * `app_state` - Shared application state for handlers.
+/// * `idx` - Wallet index in the shared wallet list.
+/// * `req` - JSON payload with transaction details (to_address, amount).
+///
+/// # Returns
+/// A JSON response with the built transaction data, or null if insufficient funds.
 pub async fn build_wallet_transaction(State(app_state): State<SharedAppState>, Path(idx): Path<usize>, Json(req): Json<BuildTxRequest>) -> Json<Option<Transaction>> {
     let state = app_state.read().await;
     let wallets = state.wallets.read().await;
@@ -138,12 +179,15 @@ pub async fn build_wallet_transaction(State(app_state): State<SharedAppState>, P
 
 #[derive(Deserialize)]
 pub struct CreateWalletRequest {
+    /// Name of the wallet to be created.
     pub name: String,
 }
 
 #[derive(Deserialize)]
 pub struct BuildTxRequest {
+    /// Recipient's address for the transaction.
     pub to_address: String,
+    /// Amount of lovelace to send.
     pub amount: u64,
 }
 
